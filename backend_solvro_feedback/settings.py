@@ -13,8 +13,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import logging
 import os
 from pathlib import Path
-import dotenv
 
+import dotenv
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "reports",
 ]
 
 MIDDLEWARE = [
