@@ -14,8 +14,13 @@ class AttachmentInputSerializer(serializers.Serializer):
 
     def validate_content_base64(self, value: str) -> str:
         """
-        Validate that content_base64 is decodable base64.
+        Validate that content_base64 is decodable base64 and within size limits.
         """
+        # Limit base64 payload to ~7MB, which corresponds to roughly ~5MB raw file size.
+        # This prevents Out Of Memory (OOM) errors from decoding huge payloads.
+        if len(value) > 7_000_000:
+            raise serializers.ValidationError("File size exceeds the 5MB limit.")
+
         try:
             base64.b64decode(value, validate=True)
         except (binascii.Error, ValueError):
