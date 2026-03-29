@@ -139,3 +139,15 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+REST_FRAMEWORK = {
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "public_report_burst": os.getenv("THROTTLE_PUBLIC_REPORT_BURST", "3/5min"),
+        "public_report_sustained": os.getenv(
+            "THROTTLE_PUBLIC_REPORT_SUSTAINED", "10/hour"
+        ),
+    },
+}

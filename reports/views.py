@@ -5,10 +5,19 @@ from typing import Any
 from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.response import Response
+from rest_framework.throttling import ScopedRateThrottle
 from rest_framework.views import APIView
 
 from .models import Application, Issue, IssueAttachment
 from .serializers import ReportCreateSerializer
+
+
+class PublicReportBurstRateThrottle(ScopedRateThrottle):
+    scope = "public_report_burst"
+
+
+class PublicReportSustainedRateThrottle(ScopedRateThrottle):
+    scope = "public_report_sustained"
 
 
 class PublicReportCreateView(APIView):
@@ -19,6 +28,10 @@ class PublicReportCreateView(APIView):
 
     authentication_classes: list[Any] = []
     permission_classes: list[Any] = []
+    throttle_classes = [
+        PublicReportBurstRateThrottle,
+        PublicReportSustainedRateThrottle,
+    ]
 
     def post(self, request, app_id: str, *args: Any, **kwargs: Any) -> Response:
         application = get_object_or_404(Application, id=app_id, is_active=True)
