@@ -140,6 +140,23 @@ class PublicReportCreateViewTests(APITestCase):
         self.assertEqual(Issue.objects.count(), 0)
         self.assertEqual(IssueAttachment.objects.count(), 0)
 
+    def test_create_report_sanitizes_attachment_filename(self):
+        payload = self._payload(
+            attachments=[
+                {
+                    "filename": "../../../etc/passwd!@#.png",
+                    "content_type": "image/png",
+                    "content_base64": self.valid_attachment_b64,
+                }
+            ]
+        )
+
+        response = self.client.post(self.url, payload, format="json")
+
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        attachment = IssueAttachment.objects.first()
+        self.assertEqual(attachment.original_filename, "passwd.png")
+
 
 @override_settings(REST_FRAMEWORK=TEST_REST_FRAMEWORK_THROTTLE_STRICT)
 class PublicReportCreateThrottleTests(APITestCase):

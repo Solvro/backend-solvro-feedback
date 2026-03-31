@@ -1,7 +1,8 @@
-import base64
+import urllib.parse
 import uuid
 from typing import Any
 
+from django.conf import settings
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from rest_framework import status
@@ -24,7 +25,7 @@ class PublicReportSustainedRateThrottle(AnonRateThrottle):
 class PublicReportCreateView(APIView):
     """
     Public endpoint for creating reports:
-    POST /report/<app_id>
+    POST /report/<uuid:app_id>
     """
 
     authentication_classes: list[Any] = []
@@ -34,7 +35,7 @@ class PublicReportCreateView(APIView):
         PublicReportSustainedRateThrottle,
     ]
 
-    def post(self, request, app_id: str, *args: Any, **kwargs: Any) -> Response:
+    def post(self, request, app_id: uuid.UUID, *args: Any, **kwargs: Any) -> Response:
         application = get_object_or_404(Application, id=app_id, is_active=True)
 
         serializer = ReportCreateSerializer(data=request.data)
@@ -51,10 +52,9 @@ class PublicReportCreateView(APIView):
 
             attachments = validated.get("attachments", [])
             for attachment in attachments:
-                raw_content = base64.b64decode(attachment["content_base64"])
-                generated_key = (
-                    f"issues/{issue.id}/{uuid.uuid4().hex}_{attachment['filename']}"
-                )
+                raw_content = attachment["decoded_bytes"]
+                safe_filename = urllib.parse.quote(attachment["filename"])
+                generated_key = f"issues/{issue.id}/{uuid.uuid4().hex}_{safe_filename}"
 
                 # TODO (S3 integration): upload `raw_content` to S3-compatible storage.
                 # For now we store a placeholder URL based on generated key.
@@ -62,7 +62,7 @@ class PublicReportCreateView(APIView):
                     issue=issue,
                     original_filename=attachment["filename"],
                     s3_key=generated_key,
-                    file_url=f"https://example-s3.local/{generated_key}",
+                    file_url=f"{settings.S3_BASE_URL.rstrip('/')}/{generated_key}",
                     content_type=attachment["content_type"],
                     size=len(raw_content),
                 )

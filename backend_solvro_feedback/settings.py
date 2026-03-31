@@ -140,7 +140,12 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
+S3_BASE_URL = os.getenv("S3_BASE_URL", "https://example-s3.local/")
+
+NUM_PROXIES_ENV = os.getenv("NUM_PROXIES")
+
 REST_FRAMEWORK = {
+    "NUM_PROXIES": int(NUM_PROXIES_ENV) if NUM_PROXIES_ENV is not None else None,
     "DEFAULT_THROTTLE_CLASSES": [
         "rest_framework.throttling.ScopedRateThrottle",
     ],

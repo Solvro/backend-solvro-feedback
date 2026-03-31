@@ -1,5 +1,6 @@
 import base64
 import binascii
+import os
 from typing import Any
 
 from rest_framework import serializers
@@ -12,25 +13,44 @@ class AttachmentInputSerializer(serializers.Serializer):
     content_base64 = serializers.CharField()
     content_type = serializers.ChoiceField(choices=sorted(ALLOWED_CONTENT_TYPES))
 
-    def validate_content_base64(self, value: str) -> str:
-        """
-        Validate that content_base64 is decodable base64 and within size limits.
-        """
+    # We will store the decoded bytes here during validation to avoid double-decoding
+    decoded_bytes = serializers.HiddenField(default=b"")
+
+    def validate(self, attrs: dict[str, Any]) -> dict[str, Any]:
+        value = attrs.get("content_base64", "")
         # Limit base64 payload to ~7MB, which corresponds to roughly ~5MB raw file size.
         # This prevents Out Of Memory (OOM) errors from decoding huge payloads.
         if len(value) > 7_000_000:
-            raise serializers.ValidationError("File size exceeds the 5MB limit.")
+            raise serializers.ValidationError(
+                {"content_base64": "File size exceeds the 5MB limit."}
+            )
 
         try:
-            base64.b64decode(value, validate=True)
+            attrs["decoded_bytes"] = base64.b64decode(value, validate=True)
         except (binascii.Error, ValueError):
-            raise serializers.ValidationError("Invalid base64 payload.")
-        return value
+            raise serializers.ValidationError(
+                {"content_base64": "Invalid base64 payload."}
+            )
+
+        return attrs
 
     def validate_filename(self, value: str) -> str:
         if not value.strip():
             raise serializers.ValidationError("Filename cannot be empty.")
-        return value
+
+        # Normalize to just the basename to prevent directory traversal
+        basename = os.path.basename(value)
+
+        # Ensure the resulting filename is safe
+        safe_chars = set(
+            "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-. "
+        )
+        sanitized = "".join(c for c in basename if c in safe_chars)
+
+        if not sanitized.strip():
+            raise serializers.ValidationError("Filename contains no valid characters.")
+
+        return sanitized
 
 
 class ReporterSerializer(serializers.Serializer):
