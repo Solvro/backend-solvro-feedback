@@ -145,7 +145,7 @@ REST_FRAMEWORK = {
         "rest_framework.throttling.ScopedRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "public_report_burst": os.getenv("THROTTLE_PUBLIC_REPORT_BURST", "3/5min"),
+        "public_report_burst": os.getenv("THROTTLE_PUBLIC_REPORT_BURST", "3/min"),
         "public_report_sustained": os.getenv(
             "THROTTLE_PUBLIC_REPORT_SUSTAINED", "10/hour"
         ),
