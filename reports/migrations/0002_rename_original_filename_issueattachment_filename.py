@@ -4,15 +4,14 @@ from django.db import migrations
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reports', '0001_initial'),
+        ("reports", "0001_initial"),
     ]
 
     operations = [
         migrations.RenameField(
-            model_name='issueattachment',
-            old_name='original_filename',
-            new_name='filename',
+            model_name="issueattachment",
+            old_name="original_filename",
+            new_name="filename",
         ),
     ]
