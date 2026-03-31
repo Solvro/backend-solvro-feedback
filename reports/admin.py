@@ -20,6 +20,6 @@ class IssueAdmin(admin.ModelAdmin):
 
 @admin.register(IssueAttachment)
 class IssueAttachmentAdmin(admin.ModelAdmin):
-    list_display = ("original_filename", "issue", "content_type", "size", "created_at")
-    search_fields = ("original_filename", "issue__title")
+    list_display = ("filename", "issue", "content_type", "size", "created_at")
+    search_fields = ("filename", "issue__title")
     readonly_fields = ("created_at",)

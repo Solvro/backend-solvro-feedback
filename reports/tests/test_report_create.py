@@ -14,8 +14,8 @@ TEST_REST_FRAMEWORK_NO_THROTTLE_INTERFERENCE = {
         "rest_framework.throttling.AnonRateThrottle",
     ],
     "DEFAULT_THROTTLE_RATES": {
-        "public_report_burst": "2/min",
-        "public_report_sustained": "2/min",
+        "public_report_burst": "1000/min",
+        "public_report_sustained": "1000/min",
     },
 }
 
@@ -92,7 +92,7 @@ class PublicReportCreateViewTests(APITestCase):
         self.assertEqual(IssueAttachment.objects.count(), 1)
         attachment = IssueAttachment.objects.first()
         self.assertEqual(attachment.issue_id, issue.id)
-        self.assertEqual(attachment.original_filename, "screen.png")
+        self.assertEqual(attachment.filename, "screen.png")
         self.assertEqual(attachment.content_type, "image/png")
         self.assertGreater(attachment.size, 0)
 
@@ -155,7 +155,7 @@ class PublicReportCreateViewTests(APITestCase):
 
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         attachment = IssueAttachment.objects.first()
-        self.assertEqual(attachment.original_filename, "passwd.png")
+        self.assertEqual(attachment.filename, "passwd.png")
 
 
 @override_settings(REST_FRAMEWORK=TEST_REST_FRAMEWORK_THROTTLE_STRICT)

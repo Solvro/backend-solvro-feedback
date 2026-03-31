@@ -28,12 +28,12 @@ class PublicReportCreateView(APIView):
     POST /report/<uuid:app_id>
     """
 
-    authentication_classes: list[Any] = []
-    permission_classes: list[Any] = []
-    throttle_classes = [
+    authentication_classes: tuple[Any, ...] = ()
+    permission_classes: tuple[Any, ...] = ()
+    throttle_classes = (
         PublicReportBurstRateThrottle,
         PublicReportSustainedRateThrottle,
-    ]
+    )
 
     def post(self, request, app_id: uuid.UUID, *args: Any, **kwargs: Any) -> Response:
         application = get_object_or_404(Application, id=app_id, is_active=True)
@@ -60,7 +60,7 @@ class PublicReportCreateView(APIView):
                 # For now we store a placeholder URL based on generated key.
                 IssueAttachment.objects.create(
                     issue=issue,
-                    original_filename=attachment["filename"],
+                    filename=attachment["filename"],
                     s3_key=generated_key,
                     file_url=f"{settings.S3_BASE_URL.rstrip('/')}/{generated_key}",
                     content_type=attachment["content_type"],

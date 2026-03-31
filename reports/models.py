@@ -62,7 +62,7 @@ class IssueAttachment(models.Model):
         on_delete=models.CASCADE,
         related_name="attachments",
     )
-    original_filename = models.CharField(max_length=255)
+    filename = models.CharField(max_length=255)
     s3_key = models.CharField(max_length=500)
     file_url = models.URLField(max_length=1000)
     content_type = models.CharField(max_length=100)
@@ -73,4 +73,4 @@ class IssueAttachment(models.Model):
         ordering = ["created_at"]
 
     def __str__(self) -> str:
-        return self.original_filename
+        return self.filename

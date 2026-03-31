@@ -53,17 +53,10 @@ class AttachmentInputSerializer(serializers.Serializer):
         return sanitized
 
 
-class ReporterSerializer(serializers.Serializer):
-    name = serializers.CharField(required=False, allow_blank=True, max_length=255)
-    email = serializers.EmailField(required=False)
-
-
 class ReportCreateSerializer(serializers.Serializer):
     title = serializers.CharField(min_length=3, max_length=200)
     description = serializers.CharField(min_length=10, max_length=10_000)
     diagnostics = serializers.JSONField(required=False)
-    reporter = ReporterSerializer(required=False)
-    metadata = serializers.JSONField(required=False)
     attachments = AttachmentInputSerializer(many=True, required=False)
 
     def validate_attachments(self, value: list[dict[str, Any]]) -> list[dict[str, Any]]:
