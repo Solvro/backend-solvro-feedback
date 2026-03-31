@@ -13,8 +13,8 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 import logging
 import os
 from pathlib import Path
-import dotenv
 
+import dotenv
 
 logger = logging.getLogger(__name__)
 
@@ -55,6 +55,8 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "rest_framework",
+    "reports",
 ]
 
 MIDDLEWARE = [
@@ -137,3 +139,20 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+S3_BASE_URL = os.getenv("S3_BASE_URL", "https://example-s3.local/")
+
+NUM_PROXIES_ENV = os.getenv("NUM_PROXIES")
+
+REST_FRAMEWORK = {
+    "NUM_PROXIES": int(NUM_PROXIES_ENV) if NUM_PROXIES_ENV is not None else None,
+    "DEFAULT_THROTTLE_CLASSES": [
+        "rest_framework.throttling.ScopedRateThrottle",
+    ],
+    "DEFAULT_THROTTLE_RATES": {
+        "public_report_burst": os.getenv("THROTTLE_PUBLIC_REPORT_BURST", "3/min"),
+        "public_report_sustained": os.getenv(
+            "THROTTLE_PUBLIC_REPORT_SUSTAINED", "10/hour"
+        ),
+    },
+}
