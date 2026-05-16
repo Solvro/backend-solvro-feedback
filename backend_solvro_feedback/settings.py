@@ -14,6 +14,7 @@ import logging
 import os
 from pathlib import Path
 import dotenv
+from authlib.integrations.django_client import OAuth
 
 
 logger = logging.getLogger(__name__)
@@ -72,7 +73,7 @@ ROOT_URLCONF = "backend_solvro_feedback.urls"
 TEMPLATES = [
     {
         "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
+        "DIRS": [BASE_DIR / "templates"],
         "APP_DIRS": True,
         "OPTIONS": {
             "context_processors": [
@@ -120,6 +121,22 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHLIB_OAUTH_CLIENTS = {
+    "solvro-auth": {
+        "client_id": os.getenv("SOLVRO_AUTH_CLIENT_ID", "solvro-feedback"),
+        "client_secret": os.getenv("SOLVRO_AUTH_CLIENT_SECRET", ""),
+        "access_token_url": "https://auth.solvro.pl/realms/solvro/protocol/openid-connect/token",
+        "access_token_params": None,
+        "refresh_token_url": None,
+        "authorize_url": "https://auth.solvro.pl/realms/solvro/protocol/openid-connect/auth",
+        "api_base_url": "https://api.feedback.solvro.pl/",
+        "server_metadata_url": "https://auth.solvro.pl/realms/solvro/.well-known/openid-configuration",
+        "client_kwargs": {"scope": "openid profile email"},
+    }
+}
+
+oauth = OAuth()
+oauth.register(name="solvro-auth")
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/

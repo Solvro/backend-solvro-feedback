@@ -1,0 +1,64 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block extrastyle %}{{ block.super }}
+    <link rel="stylesheet" href="{% static "admin/css/login.css" %}">
+{% endblock %}
+
+{% block bodyclass %}{{ block.super }} login{% endblock %}
+
+{% block usertools %}{% endblock %}
+{% block nav-global %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block content_title %}{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}
+
+{% block content %}
+    <div id="content-main">
+        {% if user.is_authenticated %}
+            <p class="errornote">
+                {% blocktranslate trimmed %}
+                    Jesteś zalogowany jako {{ user.username }}, ale nie masz dostępu do tej strony.
+                {% endblocktranslate %}
+            </p>
+        {% endif %}
+
+        <div class="submit-row">
+            <div class="flex-column my-4">
+                <a class="button solvro-btn" href="{% url 'solvro-login' %}">Zaloguj przez Solvro Auth</a>
+            </div>
+        </div>
+    </div>
+    
+    <style>
+        a.button {
+            display: inline-block;
+            padding: 10px 20px;
+            text-decoration: none;
+            border-radius: 5px;
+            text-align: center;
+        }
+
+        .solvro-btn {
+            background-color: #000;
+            color: #fff;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        
+        .solvro-btn:hover {
+            background-color: #333;
+        }
+
+        .flex-column {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .my-4 {
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+{% endblock %}
