@@ -18,6 +18,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
+from .auth_views import SolvroAdminLoginView, SolvroAdminAuthorizeView
+
 urlpatterns = [
+    path("admin/login/solvro/", SolvroAdminLoginView.as_view(), name="solvro-login"),
+    path(
+        "admin/authorize/", SolvroAdminAuthorizeView.as_view(), name="solvro-authorize"
+    ),
     path("admin/", admin.site.urls),
 ]
