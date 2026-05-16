@@ -6,7 +6,7 @@ from django.urls import reverse
 from django.http import HttpResponseBadRequest
 import logging
 
-from backend_solvro_feedback.settings import oauth
+from backend_solvro_feedback.oauth import oauth
 
 logger = logging.getLogger(__name__)
 
@@ -49,16 +49,11 @@ class SolvroAdminAuthorizeView(View):
             logger.error("Solvro user profile missing email.")
             return HttpResponseBadRequest("Missing email in user profile.")
 
-        # Ensure the user exists and has admin permissions
+        # Ensure the user exists - created without admin permissions
+        # Admin access must be granted manually by existing admin
         user, created = User.objects.get_or_create(
             username=email, defaults={"email": email}
         )
-
-        # Grant staff and superuser permissions if not already granted
-        if not user.is_staff or not user.is_superuser:
-            user.is_staff = True
-            user.is_superuser = True
-            user.save()
 
         # Log the user in
         login(request, user)
