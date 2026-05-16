@@ -55,6 +55,11 @@ class SolvroAdminAuthorizeView(View):
             username=email, defaults={"email": email}
         )
 
+        # Set unusable password for OAuth-only users
+        if created:
+            user.set_unusable_password()
+            user.save()
+
         # Log the user in
         login(request, user)
 
