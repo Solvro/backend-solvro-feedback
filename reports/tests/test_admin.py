@@ -1,11 +1,10 @@
-import pytest
+from django.test import SimpleTestCase
 
 from reports.admin import ApplicationAdmin, IssueAdmin, IssueAttachmentAdmin
 from reports.models import IssueStatus
 
 
-@pytest.mark.django_db
-class TestApplicationAdmin:
+class TestApplicationAdmin(SimpleTestCase):
     def test_list_display(self):
         assert ApplicationAdmin.list_display == ("name", "is_active", "repo_url")
 
@@ -16,8 +15,7 @@ class TestApplicationAdmin:
         assert ApplicationAdmin.search_fields == ("name", "repo_url")
 
 
-@pytest.mark.django_db
-class TestIssueAdmin:
+class TestIssueAdmin(SimpleTestCase):
     def test_list_display(self):
         assert "title" in IssueAdmin.list_display
         assert "application" in IssueAdmin.list_display
@@ -35,8 +33,7 @@ class TestIssueAdmin:
         assert "updated_at" in IssueAdmin.readonly_fields
 
 
-@pytest.mark.django_db
-class TestIssueAttachmentAdmin:
+class TestIssueAttachmentAdmin(SimpleTestCase):
     def test_list_display(self):
         assert IssueAttachmentAdmin.list_display == (
             "filename",
@@ -53,8 +50,7 @@ class TestIssueAttachmentAdmin:
         assert IssueAttachmentAdmin.readonly_fields == ("created_at",)
 
 
-@pytest.mark.django_db
-class TestIssueStatus:
+class TestIssueStatus(SimpleTestCase):
     def test_status_new(self):
         assert IssueStatus.NEW == "NEW"
 

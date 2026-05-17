@@ -1,7 +1,6 @@
 import base64
 import uuid
 
-import pytest
 from django.core.cache import cache
 from django.test import override_settings
 from django.urls import reverse
@@ -31,6 +30,7 @@ TEST_REST_FRAMEWORK_THROTTLE_STRICT = {
 
 def _setup_throttle_rates():
     from rest_framework.settings import api_settings
+
     from reports.views import (
         PublicReportBurstRateThrottle,
         PublicReportSustainedRateThrottle,
@@ -44,7 +44,6 @@ def _setup_throttle_rates():
     )
 
 
-@pytest.mark.django_db
 @override_settings(REST_FRAMEWORK=TEST_REST_FRAMEWORK_NO_THROTTLE)
 class TestPublicReportCreateView(APITestCase):
     def setUp(self):
@@ -191,7 +190,6 @@ class TestPublicReportCreateView(APITestCase):
         assert "test.png" in attachment.s3_key
 
 
-@pytest.mark.django_db
 @override_settings(REST_FRAMEWORK=TEST_REST_FRAMEWORK_THROTTLE_STRICT)
 class TestReportThrottling(APITestCase):
     def setUp(self):

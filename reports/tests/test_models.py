@@ -1,12 +1,12 @@
 import uuid
 
-import pytest
+from django.db import IntegrityError
+from django.test import TestCase
 
 from reports.models import Application, Issue, IssueAttachment, IssueStatus
 
 
-@pytest.mark.django_db
-class TestApplicationModel:
+class TestApplicationModel(TestCase):
     def test_create_application(self):
         app = Application.objects.create(
             name="Test App",
@@ -36,15 +36,14 @@ class TestApplicationModel:
             name="Unique App",
             repo_url="https://github.com/test/repo",
         )
-        with pytest.raises(Exception):
+        with self.assertRaises(IntegrityError):
             Application.objects.create(
                 name="Unique App",
                 repo_url="https://github.com/test/repo2",
             )
 
 
-@pytest.mark.django_db
-class TestIssueModel:
+class TestIssueModel(TestCase):
     def test_create_issue(self):
         app = Application.objects.create(
             name="Issue App",
@@ -145,8 +144,7 @@ class TestIssueModel:
         assert issues[1] == issue1
 
 
-@pytest.mark.django_db
-class TestIssueAttachmentModel:
+class TestIssueAttachmentModel(TestCase):
     def test_create_attachment(self):
         app = Application.objects.create(
             name="Attach App",
@@ -241,8 +239,7 @@ class TestIssueAttachmentModel:
         assert attachments[1] == att2
 
 
-@pytest.mark.django_db
-class TestIssueStatusChoices:
+class TestIssueStatusChoices(TestCase):
     def test_status_new(self):
         assert IssueStatus.NEW == "NEW"
 

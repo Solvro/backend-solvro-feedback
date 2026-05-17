@@ -1,6 +1,6 @@
 import base64
 
-import pytest
+from django.test import SimpleTestCase
 
 from reports.serializers import (
     ALLOWED_CONTENT_TYPES,
@@ -9,8 +9,7 @@ from reports.serializers import (
 )
 
 
-@pytest.mark.django_db
-class TestAttachmentInputSerializer:
+class TestAttachmentInputSerializer(SimpleTestCase):
     def test_valid_attachment(self):
         b64 = base64.b64encode(b"image-data").decode("utf-8")
         data = {
@@ -93,8 +92,7 @@ class TestAttachmentInputSerializer:
         assert "content_base64" in serializer.errors
 
 
-@pytest.mark.django_db
-class TestReportCreateSerializer:
+class TestReportCreateSerializer(SimpleTestCase):
     def test_valid_report(self):
         data = {
             "title": "App crash",
