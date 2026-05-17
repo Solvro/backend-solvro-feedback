@@ -56,6 +56,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "rest_framework",
+    "simple_history",
     "reports",
 ]
 
@@ -156,3 +157,8 @@ REST_FRAMEWORK = {
         ),
     },
 }
+
+SIMPLE_HISTORY_MODELS = [
+    "reports.models.Issue",
+    "reports.models.IssueAttachment",
+]

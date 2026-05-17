@@ -3,6 +3,7 @@ import uuid
 from django.conf import settings
 from django.core.validators import MinLengthValidator
 from django.db import models
+from simple_history.models import HistoricalRecords
 
 
 class IssueStatus(models.TextChoices):
@@ -48,6 +49,7 @@ class Issue(models.Model):
     github_issue_url = models.URLField(max_length=500, null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["-created_at"]
@@ -68,6 +70,7 @@ class IssueAttachment(models.Model):
     content_type = models.CharField(max_length=100)
     size = models.PositiveIntegerField(help_text="File size in bytes")
     created_at = models.DateTimeField(auto_now_add=True)
+    history = HistoricalRecords()
 
     class Meta:
         ordering = ["created_at"]
