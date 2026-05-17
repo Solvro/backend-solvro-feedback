@@ -1,15 +1,14 @@
 from unittest.mock import MagicMock, patch
 
+from django.contrib.auth.models import User
+
 # Note: Some end-to-end tests may fail if the application is not yet
 # registered in Solvro Auth (https://auth.solvro.pl)
-
-from django.test import TestCase, RequestFactory
-from django.contrib.auth.models import User
-from django.http import HttpResponseBadRequest
+from django.test import RequestFactory, TestCase
 
 from backend_solvro_feedback.auth_views import (
-    SolvroAdminLoginView,
     SolvroAdminAuthorizeView,
+    SolvroAdminLoginView,
 )
 
 
@@ -28,6 +27,7 @@ class SolvroAdminLoginViewTestCase(TestCase):
 
         mock_oauth.create_client.assert_called_once_with("solvro-auth")
         mock_client.authorize_redirect.assert_called_once()
+        self.assertEqual(response, mock_client.authorize_redirect.return_value)
 
 
 class SolvroAdminAuthorizeViewTestCase(TestCase):
@@ -81,9 +81,7 @@ class SolvroAdminAuthorizeViewTestCase(TestCase):
 
     @patch("backend_solvro_feedback.auth_views.login")
     @patch("backend_solvro_feedback.auth_views.oauth")
-    def test_new_user_created_with_unusable_password(
-        self, mock_oauth, mock_login
-    ):
+    def test_new_user_created_with_unusable_password(self, mock_oauth, mock_login):
         request = self.factory.get("/admin/authorize/")
 
         mock_response = MagicMock()
@@ -104,13 +102,11 @@ class SolvroAdminAuthorizeViewTestCase(TestCase):
 
     @patch("backend_solvro_feedback.auth_views.login")
     @patch("backend_solvro_feedback.auth_views.oauth")
-    def test_existing_user_password_preserved(
-        self, mock_oauth, mock_login
-    ):
+    def test_existing_user_password_preserved(self, mock_oauth, mock_login):
         user = User.objects.create_user(
             username="existing@solvro.pl",
             email="existing@solvro.pl",
-            password="existingpassword"
+            password="existingpassword",
         )
 
         request = self.factory.get("/admin/authorize/")
@@ -129,12 +125,11 @@ class SolvroAdminAuthorizeViewTestCase(TestCase):
         user.refresh_from_db()
         self.assertTrue(user.has_usable_password())
         mock_login.assert_called_once()
+        self.assertEqual(response.url, "/admin/")
 
     @patch("backend_solvro_feedback.auth_views.login")
     @patch("backend_solvro_feedback.auth_views.oauth")
-    def test_successful_login_redirects_to_admin(
-        self, mock_oauth, mock_login
-    ):
+    def test_successful_login_redirects_to_admin(self, mock_oauth, mock_login):
         request = self.factory.get("/admin/authorize/")
 
         mock_response = MagicMock()
