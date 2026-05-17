@@ -8,63 +8,160 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     dependencies = [
-        ('reports', '0002_rename_original_filename_issueattachment_filename'),
+        ("reports", "0002_rename_original_filename_issueattachment_filename"),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
 
     operations = [
         migrations.CreateModel(
-            name='HistoricalIssue',
+            name="HistoricalIssue",
             fields=[
-                ('id', models.BigIntegerField(auto_created=True, blank=True, db_index=True, verbose_name='ID')),
-                ('title', models.CharField(max_length=200, validators=[django.core.validators.MinLengthValidator(3)])),
-                ('description', models.TextField(validators=[django.core.validators.MinLengthValidator(10)])),
-                ('diagnostics', models.JSONField(blank=True, null=True)),
-                ('status', models.CharField(choices=[('NEW', 'New'), ('VERIFIED', 'Verified'), ('GITHUB_CREATED', 'GitHub created'), ('REJECTED', 'Rejected')], db_index=True, default='NEW', max_length=20)),
-                ('github_issue_number', models.PositiveIntegerField(blank=True, null=True)),
-                ('github_issue_url', models.URLField(blank=True, max_length=500, null=True)),
-                ('created_at', models.DateTimeField(blank=True, editable=False)),
-                ('updated_at', models.DateTimeField(blank=True, editable=False)),
-                ('history_id', models.AutoField(primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField(db_index=True)),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('application', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='reports.application')),
-                ('author', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
+                (
+                    "id",
+                    models.BigIntegerField(
+                        auto_created=True, blank=True, db_index=True, verbose_name="ID"
+                    ),
+                ),
+                (
+                    "title",
+                    models.CharField(
+                        max_length=200,
+                        validators=[django.core.validators.MinLengthValidator(3)],
+                    ),
+                ),
+                (
+                    "description",
+                    models.TextField(
+                        validators=[django.core.validators.MinLengthValidator(10)]
+                    ),
+                ),
+                ("diagnostics", models.JSONField(blank=True, null=True)),
+                (
+                    "status",
+                    models.CharField(
+                        choices=[
+                            ("NEW", "New"),
+                            ("VERIFIED", "Verified"),
+                            ("GITHUB_CREATED", "GitHub created"),
+                            ("REJECTED", "Rejected"),
+                        ],
+                        db_index=True,
+                        default="NEW",
+                        max_length=20,
+                    ),
+                ),
+                (
+                    "github_issue_number",
+                    models.PositiveIntegerField(blank=True, null=True),
+                ),
+                (
+                    "github_issue_url",
+                    models.URLField(blank=True, max_length=500, null=True),
+                ),
+                ("created_at", models.DateTimeField(blank=True, editable=False)),
+                ("updated_at", models.DateTimeField(blank=True, editable=False)),
+                ("history_id", models.AutoField(primary_key=True, serialize=False)),
+                ("history_date", models.DateTimeField(db_index=True)),
+                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                (
+                    "history_type",
+                    models.CharField(
+                        choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")],
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "application",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to="reports.application",
+                    ),
+                ),
+                (
+                    "author",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "history_user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'historical issue',
-                'verbose_name_plural': 'historical issues',
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': ('history_date', 'history_id'),
+                "verbose_name": "historical issue",
+                "verbose_name_plural": "historical issues",
+                "ordering": ("-history_date", "-history_id"),
+                "get_latest_by": ("history_date", "history_id"),
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
         ),
         migrations.CreateModel(
-            name='HistoricalIssueAttachment',
+            name="HistoricalIssueAttachment",
             fields=[
-                ('id', models.BigIntegerField(auto_created=True, blank=True, db_index=True, verbose_name='ID')),
-                ('filename', models.CharField(max_length=255)),
-                ('s3_key', models.CharField(max_length=500)),
-                ('file_url', models.URLField(max_length=1000)),
-                ('content_type', models.CharField(max_length=100)),
-                ('size', models.PositiveIntegerField(help_text='File size in bytes')),
-                ('created_at', models.DateTimeField(blank=True, editable=False)),
-                ('history_id', models.AutoField(primary_key=True, serialize=False)),
-                ('history_date', models.DateTimeField(db_index=True)),
-                ('history_change_reason', models.CharField(max_length=100, null=True)),
-                ('history_type', models.CharField(choices=[('+', 'Created'), ('~', 'Changed'), ('-', 'Deleted')], max_length=1)),
-                ('history_user', models.ForeignKey(null=True, on_delete=django.db.models.deletion.SET_NULL, related_name='+', to=settings.AUTH_USER_MODEL)),
-                ('issue', models.ForeignKey(blank=True, db_constraint=False, null=True, on_delete=django.db.models.deletion.DO_NOTHING, related_name='+', to='reports.issue')),
+                (
+                    "id",
+                    models.BigIntegerField(
+                        auto_created=True, blank=True, db_index=True, verbose_name="ID"
+                    ),
+                ),
+                ("filename", models.CharField(max_length=255)),
+                ("s3_key", models.CharField(max_length=500)),
+                ("file_url", models.URLField(max_length=1000)),
+                ("content_type", models.CharField(max_length=100)),
+                ("size", models.PositiveIntegerField(help_text="File size in bytes")),
+                ("created_at", models.DateTimeField(blank=True, editable=False)),
+                ("history_id", models.AutoField(primary_key=True, serialize=False)),
+                ("history_date", models.DateTimeField(db_index=True)),
+                ("history_change_reason", models.CharField(max_length=100, null=True)),
+                (
+                    "history_type",
+                    models.CharField(
+                        choices=[("+", "Created"), ("~", "Changed"), ("-", "Deleted")],
+                        max_length=1,
+                    ),
+                ),
+                (
+                    "history_user",
+                    models.ForeignKey(
+                        null=True,
+                        on_delete=django.db.models.deletion.SET_NULL,
+                        related_name="+",
+                        to=settings.AUTH_USER_MODEL,
+                    ),
+                ),
+                (
+                    "issue",
+                    models.ForeignKey(
+                        blank=True,
+                        db_constraint=False,
+                        null=True,
+                        on_delete=django.db.models.deletion.DO_NOTHING,
+                        related_name="+",
+                        to="reports.issue",
+                    ),
+                ),
             ],
             options={
-                'verbose_name': 'historical issue attachment',
-                'verbose_name_plural': 'historical issue attachments',
-                'ordering': ('-history_date', '-history_id'),
-                'get_latest_by': ('history_date', 'history_id'),
+                "verbose_name": "historical issue attachment",
+                "verbose_name_plural": "historical issue attachments",
+                "ordering": ("-history_date", "-history_id"),
+                "get_latest_by": ("history_date", "history_id"),
             },
             bases=(simple_history.models.HistoricalChanges, models.Model),
         ),
