@@ -3,3 +3,4 @@ Django~=6.0.3
 psycopg[binary]==3.3.3
 drf-spectacular==0.29.0
 djangorestframework~=3.16.1
+django-simple-history~=3.7.0
